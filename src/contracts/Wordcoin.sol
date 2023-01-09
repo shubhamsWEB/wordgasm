@@ -6,8 +6,10 @@ contract WordCoin {
     string public symbol = "WGC";
     uint256 public totalSupply = 1000000000000000000000000000;
     uint256 public decimals = 18;
+    address me;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Rewarded(address indexed _to, uint256 _value);
     event Approval(
         address indexed _owner,
         address indexed _spender,
@@ -20,6 +22,7 @@ contract WordCoin {
 
     constructor() public {
         balanceOf[msg.sender] = totalSupply;
+        me = msg.sender;
     }
 
     function transfer(address _to, uint256 _value)
@@ -33,11 +36,18 @@ contract WordCoin {
         return true;
     }
 
-    function issueFreeTokens() public returns (bool success) {
-        balanceOf[msg.sender] += 100000000000000000000;
-        emit FreeTokens(msg.sender, 100000000000000000000);
+    function rewardTokens(address _to,uint256 _value) public returns (bool success) {
+         balanceOf[me] -= _value;
+        balanceOf[_to] += _value;
+        emit Rewarded(_to, _value);
         return true;
     }
+
+    // function issueFreeTokens() public returns (bool success) {
+    //     balanceOf[msg.sender] += 100000000000000000000;
+    //     emit FreeTokens(msg.sender, 100000000000000000000);
+    //     return true;
+    // }
 
     function approve(address _spender, uint256 _value)
         public

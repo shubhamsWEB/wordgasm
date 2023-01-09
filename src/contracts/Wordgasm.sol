@@ -1,10 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.4.22 <0.9.0;
 
+import "./WordCoin.sol";
+
 contract Wordgasm {
     mapping(bytes32 =>Word) public wordRegistry;
     mapping(address =>Word[]) public userWordRegistry;
     Word[] public words;
+    WordCoin public wordCoin;
+    address public owner;
+    constructor(WordCoin _wordcoin) {
+        wordCoin = _wordcoin;
+        owner = msg.sender;
+    }
 
 
     event NewWordAdded(address indexed _from, bytes32 _word);
@@ -22,8 +30,9 @@ contract Wordgasm {
         // Add the word to the blockchain and store the definition and the address of the submitter
         userWordRegistry[msg.sender].push(Word(_definition,msg.sender,_newWord));
         wordRegistry[_newWord] = Word(_definition,msg.sender,_newWord);
-        emit NewWordAdded(msg.sender,_newWord);
         words.push(Word(_definition,msg.sender,_newWord));
+        wordCoin.rewardTokens(msg.sender,50000000000000000000);
+        emit NewWordAdded(msg.sender,_newWord);
     }
 
     function transferOwnership(bytes32 _word, address _newOwner) public {
